@@ -22,17 +22,20 @@
 #
 #
 
+import abc
 import asyncio
 
 
-class IdleWatcher(object):
+class IdleWatcher(abc.ABC):
     def __init__(self):
         pass
 
+    @abc.abstractmethod
     @asyncio.coroutine
     def wait_for_state_change(self):
         pass
 
+    @abc.abstractmethod
     def is_idle(self):
         pass
 

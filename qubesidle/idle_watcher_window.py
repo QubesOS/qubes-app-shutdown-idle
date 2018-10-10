@@ -22,77 +22,106 @@
 #
 #
 
+# must implement idle_watcher.IdleWatcher
+# methods: wait_for_state_change (@asyncio.coroutine), takes no arguments,
+# returns when state change is detected, must handle asyncio.CancelledError
+# is_idle, not a coroutine, returns whether is idle (True) or not (False)
 
-import xcffib as xcb
+
+import xcffib
 from xcffib import xproto
+import asyncio
+from . import idle_watcher
 
-import select
-import time
 
-
-class IdleWatcher(object):
+class IdleWatcher(idle_watcher.IdleWatcher):
     def __init__(self):
-        self.idle_timeout = 5*60
+        super(IdleWatcher, self).__init__()
 
-        self.conn = xcb.connect()
+        self.conn = xcffib.connect()
         self.setup = self.conn.get_setup()
         self.root = self.setup.roots[0].root
 
+        atom = self.conn.core.InternAtom(
+            False, len("_NET_SUPPORTING_WM_CHECK"),
+            "_NET_SUPPORTING_WM_CHECK").reply().atom
+        self.qubes_window_id = self.conn.core.GetProperty(
+            False,  # delete
+            self.root,  # window
+            atom,
+            xproto.Atom.WINDOW,
+            0,  # long_offset
+            512 * 1024 # long_length
+        ).reply().value.to_atoms()[0]
+        # the thing above is equivalent to writing
+        #  xprop -root _NET_SUPPORTING_WM_CHECK
+
         self.windows = set()
 
-    def watch_window(self, w):
-        self.conn.core.ChangeWindowAttributesChecked(
-            w, xproto.CW.EventMask, [xproto.EventMask.PropertyChange])
+        self.wait_future = None
+
+        file_descriptor = self.conn.get_file_descriptor()
+        loop = asyncio.get_event_loop()
+        loop.add_reader(file_descriptor, self.read_events)
+
+        self.initial_sync()
 
     def initial_sync(self):
         cookie = self.conn.core.QueryTree(self.root)
         root_tree = cookie.reply()
         cookies = {}
         for w in root_tree.children:
+            if w == self.qubes_window_id:
+                continue
             cookies[w] = self.conn.core.GetWindowAttributes(w)
-            print("initial: {!s}".format(w))
         for w, cookie in cookies.items():
             attr = cookie.reply()
             if attr.map_state == xproto.MapState.Viewable:
                 self.windows.add(w)
-                print("initial viewable: {!s}".format(w))
 
-    def watch_for_idle(self):
+    @asyncio.coroutine
+    def wait_for_state_change(self):
+
         self.conn.core.ChangeWindowAttributesChecked(
             self.root, xproto.CW.EventMask,
             [xproto.EventMask.SubstructureNotify])
         self.conn.flush()
-        self.initial_sync()
-        x_fd = self.conn.get_file_descriptor()
-        idle_start = None
 
-        while True:
-            if idle_start:
-                remaining_timeout = time.time() - idle_start + self.idle_timeout
-            else:
-                remaining_timeout = None
-            fd_r, fd_w, fd_e = select.select([x_fd], [], [], remaining_timeout)
-            if fd_r:
-                for ev in iter(self.conn.poll_for_event, None):
-                    if isinstance(ev, xproto.CreateNotifyEvent):
-                        print("create: {!s}, count: {!s}".format(ev.window, len(self.windows)))
-                    elif isinstance(ev, xproto.MapNotifyEvent):
-                        self.windows.add(ev.window)
-                        print("map: {!s}, count: {!s}".format(ev.window, len(self.windows)))
-                        idle_start = None
-                    elif isinstance(ev, xproto.UnmapNotifyEvent):
-                        self.windows.discard(ev.window)
-                        print("unmap: {!s}, count: {!s}".format(ev.window, len(self.windows)))
-                        if not self.windows:
-                            print("empty!")
-                            idle_start = time.time()
-                    elif isinstance(ev, xproto.DestroyNotifyEvent):
-                        print("destroy: {!s}, count: {!s}".format(ev.window, len(self.windows)))
-            if idle_start and idle_start + self.idle_timeout < time.time():
-                print("idle!!!!!")
+        self.wait_future = asyncio.Future()
 
+        try:
+            yield from self.wait_future
+        except asyncio.CancelledError:
+            self.wait_future.cancel()
+        return
 
-if __name__ == '__main__':
-    retriever = IdleWatcher()
-    retriever.watch_for_idle()
+    def read_events(self):
+        flag_for_end = False
+        for ev in iter(self.conn.poll_for_event, None):
+            if ev.window == self.qubes_window_id:
+                continue
+            if isinstance(ev, xproto.MapNotifyEvent):
+                if not self.windows:
+                    flag_for_end = True
+                self.windows.add(ev.window)
+            elif isinstance(ev, xproto.UnmapNotifyEvent):
+                self.windows.discard(ev.window)
+                if not self.windows:
+                    flag_for_end = True
 
+        if flag_for_end:
+                self.wait_future.set_result(True)
+
+    def is_idle(self):
+        cookie = self.conn.core.QueryTree(self.root)
+        root_tree = cookie.reply()
+        for w in root_tree.children:
+            try:
+                if w == self.qubes_window_id:
+                    continue
+                attr = self.conn.core.GetWindowAttributes(w).reply()
+                if attr.map_state == xproto.MapState.Viewable:
+                    return False
+            except xcffib.xproto.WindowError:
+                continue
+        return True

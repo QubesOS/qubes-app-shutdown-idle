@@ -22,27 +22,29 @@
 #
 #
 
-from . import idle_watcher  # this will be fixed one day
+from . import idle_watcher_window
 import asyncio
-import subprocess
 
-TIMEOUT_SECONDS = 1
+TIMEOUT_SECONDS = 20
 
 
 class IdlenessMonitor(object):
 
     def __init__(self):
         self.watchers = []
+        self.watch_the_watchers = None
 
     def add_watcher(self, watcher):
         self.watchers.append(watcher)
+        if self.watch_the_watchers:
+            self.watch_the_watchers.set_result(True)
 
     @asyncio.coroutine
     def monitor_idleness(self):
         while True:
             if not self.watchers:
-                yield from asyncio.sleep(1)
-                continue
+                self.watch_the_watchers = asyncio.Future()
+                yield from self.watch_the_watchers
             tasks = []
             for w in self.watchers:
                 tasks.append(w.wait_for_state_change())
@@ -56,8 +58,6 @@ class IdlenessMonitor(object):
             for task in pending:
                 task.cancel()
 
-            # watchers must handle CancelledError - add that to docu
-
             all_idle = all(w.is_idle() for w in self.watchers)
 
             if all_idle:
@@ -70,7 +70,6 @@ class IdlenessMonitor(object):
                     tasks,
                     return_when=asyncio.FIRST_COMPLETED,
                     timeout=TIMEOUT_SECONDS)
-
                 # noinspection PyTupleAssignmentBalance
                 done, pending = \
                     yield from wait_for_change_with_timeout
@@ -90,11 +89,14 @@ def main():
 
     # watchers = []
     # # here there be loading all watcher with some magic
-    test_watcher = idle_watcher.IdleWatcherTestTrue()
-    test_watcher2 = idle_watcher.IdleWatcherTestFalse()
+    # test_watcher = idle_watcher.IdleWatcherTestTrue()
+    # test_watcher2 = idle_watcher.IdleWatcherTestFalse()
     #
-    monitor.add_watcher(test_watcher)
-    monitor.add_watcher(test_watcher2)
+    # monitor.add_watcher(test_watcher)
+    # monitor.add_watcher(test_watcher2)
+
+    watcher = idle_watcher_window.IdleWatcher()
+    monitor.add_watcher(watcher)
 
     asyncio.get_event_loop().run_until_complete(monitor.monitor_idleness())
 

@@ -89,6 +89,8 @@ class MonitorTest(unittest.TestCase):
     def test_00_no_watcher(self):
         task = asyncio.wait([self.monitor.monitor_idleness()], timeout=5)
         done, pending = self.loop.run_until_complete(task)
+        for p in pending:
+            p.cancel()
         self.assertEqual(len(done), 0)
 
     def test_01_always_idle(self):

@@ -1,0 +1,7 @@
+*.pyc
+*.pyo
+*~
+rpm/
+pkgs/
+*.swp
+tags
