@@ -1,3 +1,4 @@
-RPM_SPEC_FILES := rpm_spec/qubes-shutdown-idle.spec
-DEBIAN_BUILD_DIRS := debian
-
+RPM_SPEC_FILES.vm := rpm_spec/qubes-shutdown-idle.spec
+RPM_SPEC_FILES := $(RPM_SPEC_FILES.$(PACKAGE_SET))
+DEBIAN_BUILD_DIRS.vm := debian
+DEBIAN_BUILD_DIRS := $(DEBIAN_BUILD_DIRS.$(PACKAGE_SET))
