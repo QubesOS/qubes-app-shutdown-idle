@@ -1,4 +1,3 @@
-ifeq ($(PACKAGE_SET),dom0)
-    RPM_SPEC_FILES := \
-        rpm_spec/qubes-dbus.spec
-endif
+RPM_SPEC_FILES := rpm_spec/qubes-shutdown-idle.spec
+DEBIAN_BUILD_DIRS := debian
+

@@ -4,29 +4,21 @@
 # The Qubes OS Project, http://www.qubes-os.org
 #
 # Copyright (C) 2015 Marek Marczykowski-Górecki
-#                              <marmarek@invisiblethingslab.com>
-#
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
+#                               <marmarek@invisiblethingslab.com>
+# Copyright (C) 2018 Marta Marczykowska-Górecka
+#                               <marmarta@invisiblethingslab.com>
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# GNU Lesser General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-#
-#
-
-# must implement idle_watcher.IdleWatcher
-# methods: wait_for_state_change (@asyncio.coroutine), takes no arguments,
-# returns when state change is detected, must handle asyncio.CancelledError
-# is_idle, not a coroutine, returns whether is idle (True) or not (False)
-
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, see <http://www.gnu.org/licenses/>.
 
 import xcffib
 from xcffib import xproto
@@ -42,6 +34,9 @@ class IdleWatcher(idle_watcher.IdleWatcher):
         self.setup = self.conn.get_setup()
         self.root = self.setup.roots[0].root
 
+        #  The lovecraftian nightmare below is equivalent to
+        #  xprop -root _NET_SUPPORTING_WM_CHECK
+        #  unfortunately, xcffib is low-level enough for this to be necessary.
         atom = self.conn.core.InternAtom(
             False, len("_NET_SUPPORTING_WM_CHECK"),
             "_NET_SUPPORTING_WM_CHECK").reply().atom
@@ -51,13 +46,13 @@ class IdleWatcher(idle_watcher.IdleWatcher):
             atom,
             xproto.Atom.WINDOW,
             0,  # long_offset
-            512 * 1024 # long_length
+            512 * 1024  # long_length
         ).reply().value.to_atoms()[0]
-        # the thing above is equivalent to writing
-        #  xprop -root _NET_SUPPORTING_WM_CHECK
 
         self.windows = set()
 
+        # an asyncio.Future used to communicate between wait_for_state_
+        # change and read_events
         self.wait_future = None
 
         file_descriptor = self.conn.get_file_descriptor()
@@ -67,6 +62,12 @@ class IdleWatcher(idle_watcher.IdleWatcher):
         self.initial_sync()
 
     def initial_sync(self):
+        """
+        Iterate over all windows and add visible windows (that are not the qubes
+        helper window) to the self.windows set.
+
+        :return: None
+        """
         cookie = self.conn.core.QueryTree(self.root)
         root_tree = cookie.reply()
         cookies = {}
@@ -81,6 +82,14 @@ class IdleWatcher(idle_watcher.IdleWatcher):
 
     @asyncio.coroutine
     def wait_for_state_change(self):
+        """
+        Waits for changes in mapped/unmapped windows reported by X Window System
+        via xcffib socket.
+        Only a change from no windows to some windows, or from some windows to
+        no windows, is reported.
+
+        :return: None
+        """
 
         self.conn.core.ChangeWindowAttributesChecked(
             self.root, xproto.CW.EventMask,
@@ -96,6 +105,14 @@ class IdleWatcher(idle_watcher.IdleWatcher):
         return
 
     def read_events(self):
+        """
+        Reports a change in mapped/unmapped X windows via setting
+        self.wait_future to done. To avoid unnecessary traffic, this function
+        reports only when the last window is unampped or, conversely, a window
+        is mapped when no windows were mapped before.
+
+        :return: None
+        """
         flag_for_end = False
         for ev in iter(self.conn.poll_for_event, None):
             if ev.window == self.qubes_window_id:
@@ -104,7 +121,8 @@ class IdleWatcher(idle_watcher.IdleWatcher):
                 if not self.windows:
                     flag_for_end = True
                 self.windows.add(ev.window)
-            elif isinstance(ev, xproto.UnmapNotifyEvent):
+            elif isinstance(ev, xproto.UnmapNotifyEvent) and \
+                    ev.window in self.windows:
                 self.windows.discard(ev.window)
                 if not self.windows:
                     flag_for_end = True
@@ -113,6 +131,11 @@ class IdleWatcher(idle_watcher.IdleWatcher):
                 self.wait_future.set_result(True)
 
     def is_idle(self):
+        """
+        Check whether any windows (other than Qubes helper window) are visible.
+
+        :return: `True` when there are no windows visible and `False` otherwise
+        """
         cookie = self.conn.core.QueryTree(self.root)
         root_tree = cookie.reply()
         for w in root_tree.children:
@@ -123,5 +146,8 @@ class IdleWatcher(idle_watcher.IdleWatcher):
                 if attr.map_state == xproto.MapState.Viewable:
                     return False
             except xcffib.xproto.WindowError:
+                #  when windows are opened in quick succession, on rare
+                #  occassions a window can vanish before we manage to iterate
+                #  over it.
                 continue
         return True

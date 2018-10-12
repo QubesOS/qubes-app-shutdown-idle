@@ -1,0 +1,4 @@
+qubes-app-shutdown-idle (1.0.0-1) unstable; urgency=low
+  * Initial release
+
+ -- Marta Marczykowska-Górecka <marmarta@invisiblethingslab.com>  Fri, 12 Oct 2018 15:00:00 +0200

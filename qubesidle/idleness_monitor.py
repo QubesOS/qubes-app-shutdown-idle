@@ -3,44 +3,68 @@
 #
 # The Qubes OS Project, http://www.qubes-os.org
 #
-# Copyright (C) 2015 Marek Marczykowski-Górecki
-#                              <marmarek@invisiblethingslab.com>
-#
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
+# Copyright (C) 2018 Marta Marczykowska-Górecka
+#                               <marmarta@invisiblethingslab.com>
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# GNU Lesser General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
-#
-#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from . import idle_watcher_window
+import os
 import asyncio
+import subprocess
+import pkg_resources
 
-TIMEOUT_SECONDS = 20
+TIMEOUT_SECONDS = 15 * 60
 
 
 class IdlenessMonitor(object):
-
     def __init__(self):
         self.watchers = []
         self.watch_the_watchers = None
 
+    def load_watchers(self):
+        """
+        Load IdleWatchers as defined by entry points named idle_watcher.
+
+        :return: None
+        """
+        for entry_point in pkg_resources.iter_entry_points('idle_watcher'):
+            self.add_watcher(entry_point.load()())
+
     def add_watcher(self, watcher):
+        """
+        Add an IdleWatcher; must be called at least once for the monitor to
+        actually do something.
+
+        :param watcher: an object implementing idle_watcher.IdleWatcher class
+        :return: None
+        """
         self.watchers.append(watcher)
         if self.watch_the_watchers:
             self.watch_the_watchers.set_result(True)
 
     @asyncio.coroutine
     def monitor_idleness(self):
+        """
+        Main idleness detection routine. It watches for any state changes
+        detected by watchers (supplied via add_watcher), and if a change is
+        detected, the monitor checks if all watchers report idleness.
+        If no, watching for state changes resumes.
+        If yes, watching resumes with a timeout given by TIMEOUT_SECONDS; if
+        timeout is exceeded without any state change events, the function
+        returns.
+
+        :return: None
+        """
         while True:
             if not self.watchers:
                 self.watch_the_watchers = asyncio.Future()
@@ -49,17 +73,19 @@ class IdlenessMonitor(object):
             for w in self.watchers:
                 tasks.append(w.wait_for_state_change())
 
-            wait_for_change = asyncio.wait(tasks,
-                                           return_when=asyncio.FIRST_COMPLETED)
+            # Wait is with a timeout, to avoid possible watcher bugs
+            wait_for_change_with_timeout = asyncio.wait(
+                tasks,
+                return_when=asyncio.FIRST_COMPLETED,
+                timeout=TIMEOUT_SECONDS)
 
             # noinspection PyTupleAssignmentBalance
-            done, pending = yield from wait_for_change
+            done, pending = yield from wait_for_change_with_timeout
 
             for task in pending:
                 task.cancel()
 
             all_idle = all(w.is_idle() for w in self.watchers)
-
             if all_idle:
                 tasks = []
 
@@ -73,35 +99,34 @@ class IdlenessMonitor(object):
                 # noinspection PyTupleAssignmentBalance
                 done, pending = \
                     yield from wait_for_change_with_timeout
+
                 if not done:
                     prep_for_shutdown = True
                 else:
                     prep_for_shutdown = False
 
-                for t in pending:
-                    t.cancel()
+                for task in pending:
+                    task.cancel()
                 if prep_for_shutdown:
                     return
 
 
 def main():
+    """
+    Main function.
+    :return: None
+    """
+
+    # check if the correct service ('shutdown-idle') was enabled
+    if not os.path.exists('/var/run/qubes-service/shutdown-idle'):
+        return
+
     monitor = IdlenessMonitor()
-
-    # watchers = []
-    # # here there be loading all watcher with some magic
-    # test_watcher = idle_watcher.IdleWatcherTestTrue()
-    # test_watcher2 = idle_watcher.IdleWatcherTestFalse()
-    #
-    # monitor.add_watcher(test_watcher)
-    # monitor.add_watcher(test_watcher2)
-
-    watcher = idle_watcher_window.IdleWatcher()
-    monitor.add_watcher(watcher)
+    monitor.load_watchers()
 
     asyncio.get_event_loop().run_until_complete(monitor.monitor_idleness())
 
-    print("SHUTDOWN")
-    # subprocess.call(['sudo', 'poweroff'])  # is this good?
+    subprocess.call(['sudo', 'poweroff'])
 
 
 if __name__ == '__main__':

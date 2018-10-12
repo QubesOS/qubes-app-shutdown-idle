@@ -1,0 +1,70 @@
+# The Qubes OS Project, http://www.qubes-os.org
+#
+# Copyright (C) 2018 Marta Marczykowska-Górecka
+#                               <marmarta@invisiblethingslab.com>
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, see <http://www.gnu.org/licenses/>.
+
+
+Name: qubes-idle
+Version:    @VERSION@
+Release:    1%{?dist}
+BuildArch:  noarch
+Summary:    Qubes Shutdown Idle Script
+
+Group:      Qubes
+Vendor:		Invisible Things Lab
+License:    GPL2+
+URL:		http://www.qubes-os.org
+
+BuildRequires: python3-setuptools
+BuildRequires: python3-devel
+Requires: python3-xcffib
+Requires: python3-setuptools
+
+Source0: %{name}-%{version}.tar.gz
+
+%prep
+%setup -q
+
+%description
+Qubes Shutdown Idle Script
+
+%build
+/usr/bin/python3 setup.py build
+
+%install
+%make_install
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(-,root,root,-)
+/usr/bin/qubes-idle-watcher
+
+%dir %{python3_sitelib}/qubesidle
+%{python3_sitelib}/qubesidle/__init__.py
+%{python3_sitelib}/qubesidle/idle_watcher.py
+%{python3_sitelib}/qubesidle/idle_watcher_window.py
+%{python3_sitelib}/qubesidle/idleness_monitor.py
+%{python3_sitelib}/qubesidle/tests_idleness_monitor.py
+%dir %{python3_sitelib}/qubesidle/__pycache__
+%{python3_sitelib}/qubesidle/__pycache__/*
+%dir %{python3_sitelib}/qubesidle-*.egg-info
+%{python3_sitelib}/qubesidle-*.egg-info/*
+%config /etc/xdg/autostart/qubes-idleness-monitor.desktop
+
+
+%changelog
+@CHANGELOG@
