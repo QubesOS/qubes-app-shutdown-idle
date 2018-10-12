@@ -59,6 +59,11 @@ class IdleWatcher(idle_watcher.IdleWatcher):
         loop = asyncio.get_event_loop()
         loop.add_reader(file_descriptor, self.read_events)
 
+        self.conn.core.ChangeWindowAttributesChecked(
+            self.root, xproto.CW.EventMask,
+            [xproto.EventMask.SubstructureNotify])
+        self.conn.flush()
+
         self.initial_sync()
 
     def initial_sync(self):
@@ -90,12 +95,6 @@ class IdleWatcher(idle_watcher.IdleWatcher):
 
         :return: None
         """
-
-        self.conn.core.ChangeWindowAttributesChecked(
-            self.root, xproto.CW.EventMask,
-            [xproto.EventMask.SubstructureNotify])
-        self.conn.flush()
-
         self.wait_future = asyncio.Future()
 
         try:

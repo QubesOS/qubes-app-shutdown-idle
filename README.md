@@ -2,7 +2,8 @@ Qubes Shutdown Idle Script
 ---------------------
 
 This is a simple script that watches the current qube for idleness and, if it's 
-idle for more than 15 minutes, shuts it down.
+idle for more than 15 minutes (timeout time is defined in
+ `qubesidle.idleness_monitor`), shuts it down.
 
 At the moment, only checking for visible windows is supported - when a VM has no
 visible windows for more than 15 minutes, it's going to be shut down. The 

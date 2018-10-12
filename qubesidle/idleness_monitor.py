@@ -51,6 +51,7 @@ class IdlenessMonitor(object):
         self.watchers.append(watcher)
         if self.watch_the_watchers:
             self.watch_the_watchers.set_result(True)
+            self.watch_the_watchers = None
 
     @asyncio.coroutine
     def monitor_idleness(self):
@@ -100,7 +101,7 @@ class IdlenessMonitor(object):
                 done, pending = \
                     yield from wait_for_change_with_timeout
 
-                if not done:
+                if not done:  # no task was done = a timeout occurred
                     prep_for_shutdown = True
                 else:
                     prep_for_shutdown = False

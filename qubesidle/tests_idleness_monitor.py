@@ -79,6 +79,7 @@ class IdleWatcherIdleStateChange(idle_watcher.IdleWatcher):
 
 class MonitorTest(unittest.TestCase):
     def setUp(self):
+        idleness_monitor.TIMEOUT_SECONDS = 15
         self.monitor = idleness_monitor.IdlenessMonitor()
         self.loop = asyncio.get_event_loop()
 
