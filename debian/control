@@ -20,3 +20,4 @@ Description: Qubes shutdown idle VM script
 Depends:
  python3-setuptools,
  python3-xcffib,
+ ${python3:Depends},
