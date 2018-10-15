@@ -31,6 +31,7 @@ BuildRequires: python3-setuptools
 BuildRequires: python3-devel
 Requires: python3-xcffib
 Requires: python3-setuptools
+Requires: python3-pyudev
 
 Source0: %{name}-%{version}.tar.gz
 
@@ -57,6 +58,7 @@ rm -rf $RPM_BUILD_ROOT
 %{python3_sitelib}/qubesidle/__init__.py
 %{python3_sitelib}/qubesidle/idle_watcher.py
 %{python3_sitelib}/qubesidle/idle_watcher_window.py
+%{python3_sitelib}/qubesidle/network_watcher.py
 %{python3_sitelib}/qubesidle/idleness_monitor.py
 %{python3_sitelib}/qubesidle/tests_idleness_monitor.py
 %dir %{python3_sitelib}/qubesidle/__pycache__

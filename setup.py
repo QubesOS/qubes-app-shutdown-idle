@@ -16,6 +16,7 @@ if __name__ == '__main__':
                 'qubes-idle-watcher = qubesidle.idleness_monitor:main'
             ],
             'idle_watcher': [
-                'x-window-monitor = qubesidle.idle_watcher_window:IdleWatcher'
+                'x-window-monitor = qubesidle.idle_watcher_window:IdleWatcher',
+                'network-watcher = qubesidle.network_watcher:NetworkWatcher'
             ]
         })
