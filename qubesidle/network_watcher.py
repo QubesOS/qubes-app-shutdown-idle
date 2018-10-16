@@ -55,7 +55,7 @@ class NetworkWatcher(idle_watcher.IdleWatcher):
         except asyncio.CancelledError:
             self.wait_future.cancel()
 
-        self.monitor.stop()
+        asyncio.get_event_loop().remove_reader(self.monitor.fileno())
 
     def is_idle(self):
         """
