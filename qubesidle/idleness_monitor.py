@@ -37,7 +37,8 @@ class IdlenessMonitor(object):
 
         :return: None
         """
-        for entry_point in pkg_resources.iter_entry_points('idle_watcher'):
+        for entry_point in pkg_resources.iter_entry_points(
+                'qubes_idle_watcher'):
             self.add_watcher(entry_point.load()())
 
     def add_watcher(self, watcher):

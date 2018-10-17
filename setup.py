@@ -15,7 +15,7 @@ if __name__ == '__main__':
             'console_scripts': [
                 'qubes-idle-watcher = qubesidle.idleness_monitor:main'
             ],
-            'idle_watcher': [
+            'qubes_idle_watcher': [
                 'x-window-monitor = qubesidle.idle_watcher_window:IdleWatcher',
                 'network-watcher = qubesidle.network_watcher:NetworkWatcher'
             ]
