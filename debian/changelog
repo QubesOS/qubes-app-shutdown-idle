@@ -1,3 +1,11 @@
+qubes-app-shutdown-idle (1.0.1-1) unstable; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * Handle CentOS python3 version
+  * travis: add CentOS
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 04 Nov 2018 03:17:49 +0100
+
 qubes-app-shutdown-idle (1.0.0-1) unstable; urgency=low
   * Initial release
 
