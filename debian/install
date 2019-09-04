@@ -1,0 +1,3 @@
+system-config/qubes-idleness-monitor.desktop /etc/xdg/autostart/
+system-config/30-qubes-idle.sh  /etc/qubes/post-install.d/
+
