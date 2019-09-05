@@ -14,6 +14,7 @@ install:
 	install -m 0644 system-config/qubes-idleness-monitor.desktop $(DESTDIR)/etc/xdg/autostart/
 	install -d $(DESTDIR)/etc/qubes/post-install.d
 	install system-config/30-qubes-idle.sh \
+		$(DESTDIR)/etc/qubes/post-install.d/30-qubes-idle.sh
 	install system-config/sudo-poweroff \
 		$(DESTDIR)/etc/sudoers.d/sudo-poweroff
 
