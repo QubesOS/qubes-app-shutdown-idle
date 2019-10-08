@@ -67,6 +67,8 @@ class IdlenessMonitor(object):
 
         :return: None
         """
+        count_idleness = 0
+
         while True:
             if not self.watchers:
                 self.watch_the_watchers = asyncio.Future()
@@ -86,31 +88,17 @@ class IdlenessMonitor(object):
 
             for task in pending:
                 task.cancel()
+                yield from task
 
             all_idle = all(w.is_idle() for w in self.watchers)
+
             if all_idle:
-                tasks = []
+                count_idleness += 1
+            else:
+                count_idleness = 0
 
-                for w in self.watchers:
-                    tasks.append(w.wait_for_state_change())
-
-                wait_for_change_with_timeout = asyncio.wait(
-                    tasks,
-                    return_when=asyncio.FIRST_COMPLETED,
-                    timeout=TIMEOUT_SECONDS)
-                # noinspection PyTupleAssignmentBalance
-                done, pending = \
-                    yield from wait_for_change_with_timeout
-
-                if not done:  # no task was done = a timeout occurred
-                    prep_for_shutdown = True
-                else:
-                    prep_for_shutdown = False
-
-                for task in pending:
-                    task.cancel()
-                if prep_for_shutdown:
-                    return
+            if count_idleness > 1:
+                return
 
 
 def main():
