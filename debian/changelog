@@ -1,3 +1,22 @@
+qubes-app-shutdown-idle (1.0.2-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * travis: switch to xenial, update distributions
+
+  [ Marta Marczykowska-Górecka ]
+  * Fixed rare scheduling error and simplified idleness checking
+
+  [ unman ]
+  * Create configuration files in Debian Package. Also make requirement
+    for passwordless sudo explicit
+  * provide sudo snippet allowing poweroff
+  * reinstated destination for 30-qubes-idle.sh
+
+  [ Marek Marczykowski-Górecki ]
+  * Create sudoers.d directory
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 09 Oct 2019 05:05:48 +0200
+
 qubes-app-shutdown-idle (1.0.1-1) unstable; urgency=medium
 
   [ Frédéric Pierret (fepitre) ]
