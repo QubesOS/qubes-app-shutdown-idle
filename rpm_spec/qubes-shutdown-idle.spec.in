@@ -67,6 +67,7 @@ rm -rf $RPM_BUILD_ROOT
 %{python3_sitelib}/qubesidle-*.egg-info/*
 %config /etc/xdg/autostart/qubes-idleness-monitor.desktop
 /etc/qubes/post-install.d/30-qubes-idle.sh
+/etc/sudoers.d/sudo-poweroff
 
 
 %changelog

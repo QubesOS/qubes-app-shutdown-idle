@@ -2,6 +2,6 @@
 Name=Qubes Idle Watcher
 Comment=Script that shuts the VM down after 15 minutes of idleness.
 Icon=qubes
-Exec=qubes-idle-watcher
+Exec=/usr/bin/qubes-idle-watcher
 Terminal=false
 Type=Application

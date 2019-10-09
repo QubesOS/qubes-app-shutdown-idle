@@ -15,6 +15,9 @@ install:
 	install -d $(DESTDIR)/etc/qubes/post-install.d
 	install system-config/30-qubes-idle.sh \
 		$(DESTDIR)/etc/qubes/post-install.d/30-qubes-idle.sh
+	install -d $(DESTDIR)/etc/sudoers.d
+	install system-config/sudo-poweroff \
+		$(DESTDIR)/etc/sudoers.d/sudo-poweroff
 
 clean:
 	rm -rf qubesidle/__pycache__
