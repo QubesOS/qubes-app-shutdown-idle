@@ -16,7 +16,7 @@
 # with this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-Name: qubes-idle
+Name: qubes-app-shutdown-idle
 Version:    @VERSION@
 Release:    1%{?dist}
 BuildArch:  noarch
@@ -32,6 +32,8 @@ BuildRequires: python%{python3_pkgversion}-devel
 Requires: python%{python3_pkgversion}-xcffib
 Requires: python%{python3_pkgversion}-setuptools
 Requires: python%{python3_pkgversion}-pyudev
+Obsoletes: qubes-idle < 2
+Provides: qubes-idle = @VERSION@
 
 Source0: %{name}-%{version}.tar.gz
 
