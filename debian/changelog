@@ -1,3 +1,17 @@
+qubes-app-shutdown-idle (1.0.3-1) unstable; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * travis: switch to bionic
+  * Update travis
+
+  [ Marta Marczykowska-Górecka ]
+  * Made package names in fedora and debian the same
+
+  [ Marek Marczykowski-Górecki ]
+  * Update version in obsoletes tag
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 14 Aug 2020 04:31:27 +0200
+
 qubes-app-shutdown-idle (1.0.2-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
