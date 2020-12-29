@@ -1,3 +1,12 @@
+qubes-app-shutdown-idle (1.0.4-1) unstable; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * Add .gitlab-ci.yml
+  * debian: update control && compat
+  * Fix build with python3 for CentOS
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 29 Dec 2020 21:18:35 +0100
+
 qubes-app-shutdown-idle (1.0.3-1) unstable; urgency=medium
 
   [ Frédéric Pierret (fepitre) ]
