@@ -44,10 +44,10 @@ Source0: %{name}-%{version}.tar.gz
 Qubes Shutdown Idle Script
 
 %build
-/usr/bin/python3 setup.py build
+%{__python3} setup.py build
 
 %install
-%make_install
+%make_install PYTHON=%{__python3}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
