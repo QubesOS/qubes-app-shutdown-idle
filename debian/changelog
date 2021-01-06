@@ -1,3 +1,13 @@
+qubes-app-shutdown-idle (1.0.5-1) unstable; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * ci: add r4.0 vms
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: lower python version requirement to fix stretch build
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 06 Jan 2021 22:00:08 +0100
+
 qubes-app-shutdown-idle (1.0.4-1) unstable; urgency=medium
 
   [ Frédéric Pierret (fepitre) ]
