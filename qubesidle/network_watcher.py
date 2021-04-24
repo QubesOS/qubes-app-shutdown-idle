@@ -36,8 +36,7 @@ class NetworkWatcher(idle_watcher.IdleWatcher):
 
         self.wait_future = None
 
-    @asyncio.coroutine
-    def wait_for_state_change(self):
+    async def wait_for_state_change(self):
         """
         Watching for events on udev network devices; if an event is adding or
         removing a network device whose name starts with 'vif', the method
@@ -51,7 +50,7 @@ class NetworkWatcher(idle_watcher.IdleWatcher):
             self.monitor.fileno(), self.device_event)
 
         try:
-            yield from self.wait_future
+            await self.wait_future
         except asyncio.CancelledError:
             self.wait_future.cancel()
 

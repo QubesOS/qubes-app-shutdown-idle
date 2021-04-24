@@ -27,8 +27,7 @@ class IdleWatcher(abc.ABC):
         pass
 
     @abc.abstractmethod
-    @asyncio.coroutine
-    def wait_for_state_change(self):
+    async def wait_for_state_change(self):
         """
         Coroutine that watches for VM state changes. It must be an
         asyncio.coroutine and must return whenever VM idleness state changes

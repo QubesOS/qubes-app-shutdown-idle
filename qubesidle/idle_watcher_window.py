@@ -85,8 +85,7 @@ class IdleWatcher(idle_watcher.IdleWatcher):
             if attr.map_state == xproto.MapState.Viewable:
                 self.windows.add(w)
 
-    @asyncio.coroutine
-    def wait_for_state_change(self):
+    async def wait_for_state_change(self):
         """
         Waits for changes in mapped/unmapped windows reported by X Window System
         via xcffib socket.
@@ -98,7 +97,7 @@ class IdleWatcher(idle_watcher.IdleWatcher):
         self.wait_future = asyncio.Future()
 
         try:
-            yield from self.wait_future
+            await self.wait_future
         except asyncio.CancelledError:
             self.wait_future.cancel()
         return
