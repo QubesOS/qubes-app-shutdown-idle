@@ -1,3 +1,13 @@
+qubes-app-shutdown-idle (1.0.6-1) unstable; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * spec: add BR make
+
+  [ Demi Marie Obenour ]
+  * Rip out @asyncio.coroutine
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 18 May 2021 00:21:11 +0200
+
 qubes-app-shutdown-idle (1.0.5-1) unstable; urgency=medium
 
   [ Frédéric Pierret (fepitre) ]
