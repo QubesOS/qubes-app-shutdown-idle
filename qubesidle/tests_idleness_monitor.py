@@ -29,10 +29,9 @@ class IdleWatcherAlwaysIdle(idle_watcher.IdleWatcher):
     def __init__(self):
         super().__init__()
 
-    @asyncio.coroutine
-    def wait_for_state_change(self):
+    async def wait_for_state_change(self):
         try:
-            yield from asyncio.sleep(100000000000)
+            await asyncio.sleep(100000000000)
         except asyncio.CancelledError:
             return
 
@@ -45,13 +44,12 @@ class IdleWatcherIdleAfter3s(idle_watcher.IdleWatcher):
         super().__init__()
         self.state = False
 
-    @asyncio.coroutine
-    def wait_for_state_change(self):
+    async def wait_for_state_change(self):
         try:
             if not self.state:
-                yield from asyncio.sleep(3)
+                await asyncio.sleep(3)
             else:
-                yield from asyncio.sleep(1000000)
+                await asyncio.sleep(1000000)
             self.state = True
             return
         except asyncio.CancelledError:
@@ -65,10 +63,9 @@ class IdleWatcherIdleStateChange(idle_watcher.IdleWatcher):
     def __init__(self):
         super().__init__()
 
-    @asyncio.coroutine
-    def wait_for_state_change(self):
+    async def wait_for_state_change(self):
         try:
-            yield from asyncio.sleep(1)
+            await asyncio.sleep(1)
             return
         except asyncio.CancelledError:
             return

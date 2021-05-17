@@ -54,8 +54,7 @@ class IdlenessMonitor(object):
             self.watch_the_watchers.set_result(True)
             self.watch_the_watchers = None
 
-    @asyncio.coroutine
-    def monitor_idleness(self):
+    async def monitor_idleness(self):
         """
         Main idleness detection routine. It watches for any state changes
         detected by watchers (supplied via add_watcher), and if a change is
@@ -72,7 +71,7 @@ class IdlenessMonitor(object):
         while True:
             if not self.watchers:
                 self.watch_the_watchers = asyncio.Future()
-                yield from self.watch_the_watchers
+                await self.watch_the_watchers
             tasks = []
             for w in self.watchers:
                 tasks.append(w.wait_for_state_change())
@@ -84,11 +83,11 @@ class IdlenessMonitor(object):
                 timeout=TIMEOUT_SECONDS)
 
             # noinspection PyTupleAssignmentBalance
-            done, pending = yield from wait_for_change_with_timeout
+            done, pending = await wait_for_change_with_timeout
 
             for task in pending:
                 task.cancel()
-                yield from task
+                await task
 
             all_idle = all(w.is_idle() for w in self.watchers)
 
