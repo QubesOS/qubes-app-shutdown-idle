@@ -29,11 +29,10 @@ class IdleWatcher(abc.ABC):
     @abc.abstractmethod
     async def wait_for_state_change(self):
         """
-        Coroutine that watches for VM state changes. It must be an
-        asyncio.coroutine and must return whenever VM idleness state changes
-        (whether the change is from idle to busy or from busy to idle).
-        Must handle asyncio.CancelledError gracefully - it means a timer ran out
-        or another watcher reported a state change.
+        Coroutine that watches for VM state changes. It must return whenever VM
+        idleness state changes (whether the change is from idle to busy or from
+        busy to idle).  Must handle asyncio.CancelledError gracefully - it means
+        a timer ran out or another watcher reported a state change.
 
         :return: None
         """
