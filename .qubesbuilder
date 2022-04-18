@@ -1,0 +1,7 @@
+vm:
+  rpm:
+    spec:
+    - rpm_spec/qubes-shutdown-idle.spec
+  deb:
+    build:
+    - debian
