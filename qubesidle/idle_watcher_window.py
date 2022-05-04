@@ -140,12 +140,40 @@ class IdleWatcher(idle_watcher.IdleWatcher):
             try:
                 if w == self.qubes_window_id:
                     continue
-                attr = self.conn.core.GetWindowAttributes(w).reply()
-                if attr.map_state == xproto.MapState.Viewable:
-                    return False
+
+                # heuristics to determine visibility of the window
+                if self.is_map_state_visible(w)\
+                    and self.is_on_screen(w):
+                        return False
+
             except xcffib.xproto.WindowError:
                 #  when windows are opened in quick succession, on rare
                 #  occassions a window can vanish before we manage to iterate
                 #  over it.
                 continue
         return True
+
+    def is_map_state_visible(self, window):
+        attr = self.conn.core.GetWindowAttributes(window).reply()
+        return attr.map_state == xproto.MapState.Viewable
+
+    def is_on_screen(self, window):
+        """
+        Detects when if a window is "on screen". For example the Nautilus file
+        manager misbehaves by showing for some seconds a window like this:
+
+            xwininfo: Window id: 0x1400663 "org.gnome.Nautilus"
+
+            Absolute upper-left X:  -99
+            Absolute upper-left Y:  -99
+            Relative upper-left X:  -99
+            Relative upper-left Y:  -99
+            Width: 1
+            Height: 1
+
+        The above case would be considered "off screen"
+        """
+        geometry = self.conn.core.GetGeometry(window).reply()
+        on_screen_x = geometry.x + geometry.width > 0
+        on_screen_y = geometry.y + geometry.height > 0
+        return on_screen_x and on_screen_y
