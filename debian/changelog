@@ -1,3 +1,16 @@
+qubes-app-shutdown-idle (1.0.7-1) unstable; urgency=medium
+
+  [ Demi Marie Obenour ]
+  * Remove mentions of @asyncio.coroutine from docs
+
+  [ Frédéric Pierret (fepitre) ]
+  * Drop Travis CI
+
+  [ deeplow ]
+  * window closing heuristic: when window is off-screen
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 04 May 2022 20:55:01 +0200
+
 qubes-app-shutdown-idle (1.0.6-1) unstable; urgency=medium
 
   [ Frédéric Pierret (fepitre) ]
