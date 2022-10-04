@@ -38,11 +38,11 @@ Provides: qubes-idle = @VERSION@
 
 Source0: %{name}-%{version}.tar.gz
 
-%prep
-%setup -q
-
 %description
 Qubes Shutdown Idle Script
+
+%prep
+%setup -q
 
 %build
 %{__python3} setup.py build
