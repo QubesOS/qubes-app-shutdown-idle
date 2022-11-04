@@ -1,3 +1,14 @@
+qubes-app-shutdown-idle (1.0.8-1) unstable; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * Add Qubes Builder v2 integration
+  * .qubesbuilder: replace 'spec' by 'build'
+
+  [ Marek Marczykowski-Górecki ]
+  * rpm: move %description before %prep
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 04 Nov 2022 16:21:42 +0100
+
 qubes-app-shutdown-idle (1.0.7-1) unstable; urgency=medium
 
   [ Demi Marie Obenour ]
