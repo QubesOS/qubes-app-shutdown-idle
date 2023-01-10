@@ -74,7 +74,7 @@ class IdlenessMonitor(object):
                 await self.watch_the_watchers
             tasks = []
             for w in self.watchers:
-                tasks.append(w.wait_for_state_change())
+                tasks.append(asyncio.create_task(w.wait_for_state_change()))
 
             # Wait is with a timeout, to avoid possible watcher bugs
             wait_for_change_with_timeout = asyncio.wait(

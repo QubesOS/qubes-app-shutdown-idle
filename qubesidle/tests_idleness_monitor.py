@@ -74,59 +74,57 @@ class IdleWatcherIdleStateChange(idle_watcher.IdleWatcher):
         return False
 
 
-class MonitorTest(unittest.TestCase):
+class MonitorTest(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         idleness_monitor.TIMEOUT_SECONDS = LOOP_TIMEOUT
         self.monitor = idleness_monitor.IdlenessMonitor()
-        self.loop = asyncio.get_event_loop()
 
-    def test_00_no_watcher(self):
-        task = asyncio.wait([self.monitor.monitor_idleness()], timeout=TEST_TIMEOUT)
-        done, pending = self.loop.run_until_complete(task)
+    async def test_00_no_watcher(self):
+        task  = asyncio.create_task(self.monitor.monitor_idleness())
+        done, pending = await asyncio.wait([task], timeout=TEST_TIMEOUT)
         for p in pending:
             p.cancel()
         self.assertEqual(len(done), 0)
 
-    def test_01_always_idle(self):
+    async def test_01_always_idle(self):
         watcher = IdleWatcherAlwaysIdle()
         self.monitor.add_watcher(watcher)
-        task = asyncio.wait([self.monitor.monitor_idleness()], timeout=TEST_TIMEOUT)
-        done, pending = self.loop.run_until_complete(task)
+        task  = asyncio.create_task(self.monitor.monitor_idleness())
+        done, pending = await asyncio.wait([task], timeout=TEST_TIMEOUT)
         self.assertEqual(len(done), 1)
 
-    def test_02_idle_after_3s_2s(self):
+    async def test_02_idle_after_3s_2s(self):
         watcher = IdleWatcherIdleAfter3s()
         self.monitor.add_watcher(watcher)
-        task = asyncio.wait([self.monitor.monitor_idleness()], timeout=2)
-        done, pending = self.loop.run_until_complete(task)
+        task  = asyncio.create_task(self.monitor.monitor_idleness())
+        done, pending = await asyncio.wait([task], timeout=2)
         self.assertEqual(len(done), 0)
 
-    def test_03_idle_after_3s_10s(self):
+    async def test_03_idle_after_3s_10s(self):
         watcher = IdleWatcherIdleAfter3s()
         self.monitor.add_watcher(watcher)
-        task = asyncio.wait([self.monitor.monitor_idleness()], timeout=TEST_TIMEOUT)
-        done, pending = self.loop.run_until_complete(task)
+        task  = asyncio.create_task(self.monitor.monitor_idleness())
+        done, pending = await asyncio.wait([task], timeout=TEST_TIMEOUT)
         self.assertEqual(len(done), 1)
 
-    def test_04_idle_after_3s_two_watchers(self):
+    async def test_04_idle_after_3s_two_watchers(self):
         watcher = IdleWatcherIdleAfter3s()
         watcher2 = IdleWatcherAlwaysIdle()
 
         self.monitor.add_watcher(watcher)
         self.monitor.add_watcher(watcher2)
 
-        task = asyncio.wait([self.monitor.monitor_idleness()], timeout=TEST_TIMEOUT)
-        done, pending = self.loop.run_until_complete(task)
+        task  = asyncio.create_task(self.monitor.monitor_idleness())
+        done, pending = await asyncio.wait([task], timeout=TEST_TIMEOUT)
         self.assertEqual(len(done), 1)
 
-    def test_05_never_idle_state_change(self):
+    async def test_05_never_idle_state_change(self):
         watcher = IdleWatcherIdleStateChange()
 
         self.monitor.add_watcher(watcher)
 
-        task = asyncio.wait([self.monitor.monitor_idleness()], timeout=TEST_TIMEOUT)
-
-        done, pending = self.loop.run_until_complete(task)
+        task  = asyncio.create_task(self.monitor.monitor_idleness())
+        done, pending = await asyncio.wait([task], timeout=TEST_TIMEOUT)
         self.assertEqual(len(done), 0)
 
 
