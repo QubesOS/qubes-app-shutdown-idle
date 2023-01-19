@@ -1,3 +1,13 @@
+qubes-app-shutdown-idle (1.0.9-1) unstable; urgency=medium
+
+  [ Marta Marczykowska-Górecka ]
+  * Fix unsupported asyncio syntax
+
+  [ Marek Marczykowski-Górecki ]
+  * ci: run unit tests
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 19 Jan 2023 14:25:39 +0100
+
 qubes-app-shutdown-idle (1.0.8-1) unstable; urgency=medium
 
   [ Frédéric Pierret (fepitre) ]
