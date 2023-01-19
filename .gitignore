@@ -5,3 +5,4 @@ rpm/
 pkgs/
 *.swp
 tags
+.coverage

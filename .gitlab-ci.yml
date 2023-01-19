@@ -7,3 +7,16 @@ include:
   project: QubesOS/qubes-continuous-integration
 - file: /r4.2/gitlab-vm.yml
   project: QubesOS/qubes-continuous-integration
+
+checks:tests:
+  stage: checks
+  before_script:
+    - "PATH=$PATH:$HOME/.local/bin"
+    - sudo dnf install -y python3-pytest
+      python3-coverage xorg-x11-server-Xvfb
+    - pip3 install --quiet -r ci/requirements.txt
+  script:
+    - xvfb-run python3 -m coverage run -m unittest discover -v
+  after_script:
+    - "PATH=$PATH:$HOME/.local/bin"
+    - ci/codecov-wrapper
