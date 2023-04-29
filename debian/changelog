@@ -1,3 +1,9 @@
+qubes-app-shutdown-idle (1.0.10-1) unstable; urgency=medium
+
+  * Disable tests on too old python
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 29 Apr 2023 15:49:52 +0200
+
 qubes-app-shutdown-idle (1.0.9-1) unstable; urgency=medium
 
   [ Marta Marczykowska-Górecka ]
