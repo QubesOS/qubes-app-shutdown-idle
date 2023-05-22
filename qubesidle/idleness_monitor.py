@@ -22,9 +22,26 @@ import os
 import asyncio
 import subprocess
 import pkg_resources
+import re
 
-TIMEOUT_SECONDS = 15 * 60
+CONFIG_FILE = []
+CONFIG = []
 
+if os.path.isfile('/rw/config/qubes/idle.config'):
+    CONFIG_FILE='/rw/config/qubes/idle.config'
+else:
+    if os.path.isfile('/etc/qubes/applications/idle.config'):
+        CONFIG_FILE='/etc/qubes/applications/idle.config'
+
+if CONFIG_FILE:
+    with open (CONFIG_FILE) as f:
+        first_line = f.readline().strip('\n')
+    CONFIG=re.findall('TIMEOUT_SECONDS\s*=\s*(\d+\s*\*\s*\d+|\d+\s*$)',first_line)
+
+if CONFIG:
+    TIMEOUT_SECONDS = eval(CONFIG[0])
+else:
+    TIMEOUT_SECONDS = 15 * 60
 
 class IdlenessMonitor(object):
     def __init__(self):
