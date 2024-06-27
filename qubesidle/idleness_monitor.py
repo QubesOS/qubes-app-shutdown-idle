@@ -21,7 +21,7 @@
 import os
 import asyncio
 import subprocess
-import pkg_resources
+import importlib.metadata
 
 TIMEOUT_SECONDS = 15 * 60
 
@@ -37,8 +37,8 @@ class IdlenessMonitor(object):
 
         :return: None
         """
-        for entry_point in pkg_resources.iter_entry_points(
-                'qubes_idle_watcher'):
+        for entry_point in importlib.metadata.entry_points(
+                group='qubes_idle_watcher'):
             self.add_watcher(entry_point.load()())
 
     def add_watcher(self, watcher):
