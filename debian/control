@@ -7,7 +7,7 @@ Build-Depends:
  dh-python,
  python3-all,
  python3-setuptools,
-X-Python3-Version: >= 3.5
+X-Python3-Version: >= 3.8
 Standards-Version: 4.4.0.1
 Homepage: https://www.qubes-os.org/
 #Vcs-Git: git://github.com/QubesOS/qubes-app-shutdown-idle.git
