@@ -1,3 +1,13 @@
+qubes-app-shutdown-idle (1.0.11-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: bump require python version
+
+  [ Marta Marczykowska-Górecka ]
+  * Remove deprecated pkg_resources, replace with importlib
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 05 Jul 2024 17:33:50 +0200
+
 qubes-app-shutdown-idle (1.0.10-1) unstable; urgency=medium
 
   * Disable tests on too old python
