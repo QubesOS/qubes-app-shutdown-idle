@@ -118,7 +118,10 @@ def main():
 
     asyncio.run(monitor.monitor_idleness())
 
-    subprocess.call(['sudo', 'poweroff'])
+    try:
+        subprocess.run(['systemctl', 'poweroff'], check=True)
+    except subprocess.CalledProcessError:
+        subprocess.run(['sudo', 'poweroff'])
 
 
 if __name__ == '__main__':
