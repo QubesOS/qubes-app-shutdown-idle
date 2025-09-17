@@ -110,10 +110,13 @@ def main():
     if not os.path.exists('/var/run/qubes-service/shutdown-idle'):
         return
 
+    # Initialize event loop for Python 3.14 compatibility
+    asyncio.set_event_loop(asyncio.new_event_loop())
+
     monitor = IdlenessMonitor()
     monitor.load_watchers()
 
-    asyncio.get_event_loop().run_until_complete(monitor.monitor_idleness())
+    asyncio.run(monitor.monitor_idleness())
 
     subprocess.call(['sudo', 'poweroff'])
 
