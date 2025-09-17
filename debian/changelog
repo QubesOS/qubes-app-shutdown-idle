@@ -1,3 +1,11 @@
+qubes-app-shutdown-idle (1.0.12-1) unstable; urgency=medium
+
+  [ Ali Mirjamali ]
+  * Update CI
+  * Initialize asyncio event loop before using it
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 18 Sep 2025 01:27:51 +0200
+
 qubes-app-shutdown-idle (1.0.11-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
