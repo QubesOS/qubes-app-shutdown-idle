@@ -1,0 +1,4 @@
+#!/bin/bash
+
+set -x
+xvfb-run python3 -m coverage run -m unittest discover -v
