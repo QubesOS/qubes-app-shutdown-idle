@@ -1,3 +1,10 @@
+qubes-app-shutdown-idle (1.0.13-1) unstable; urgency=medium
+
+  [ Ali Mirjamali ]
+  * Fix for `sysmaint` systems (Whonix & Kicksecure)
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 04 Oct 2025 05:31:25 +0200
+
 qubes-app-shutdown-idle (1.0.12-1) unstable; urgency=medium
 
   [ Ali Mirjamali ]
