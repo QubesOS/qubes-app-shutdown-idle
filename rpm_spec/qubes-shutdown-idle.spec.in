@@ -34,7 +34,7 @@ Requires: python%{python3_pkgversion}-xcffib
 Requires: python%{python3_pkgversion}-setuptools
 Requires: python%{python3_pkgversion}-pyudev
 Obsoletes: qubes-idle < 1.0.3
-Provides: qubes-idle = @VERSION@
+Provides: qubes-idle = %{version}
 
 Source0: %{name}-%{version}.tar.gz
 
